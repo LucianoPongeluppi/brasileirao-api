@@ -39,10 +39,8 @@ public class ScrapingUtil {
 	private static final String VISITANTE = "visitante";
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		String url = BASE_URL_GOOGLE + "palmeiras+x+corinthians+08/08/2020" + COMPLEMENTO_URL_GOOGLE;
-		
 		ScrapingUtil scraping = new ScrapingUtil();
+		String url = scraping.montaUrlGoogle("Atletico-MG", "Caldense");
 		scraping.obtemInformacoesPartida(url);
 	}
 	
@@ -198,5 +196,17 @@ public class ScrapingUtil {
 			valor = 0;
 		}
 		return valor;
+	}
+	
+	public String montaUrlGoogle(String nomeEquipeCasa, String nomeEquipeVisitante) {
+		try {
+			String equipeCasa = nomeEquipeCasa.replace(" ","+").replace("-","+");
+			String equipeVisitante = nomeEquipeVisitante.replace(" ","+").replace("-","+");
+			
+			return BASE_URL_GOOGLE + equipeCasa + "+x+" + equipeVisitante + COMPLEMENTO_URL_GOOGLE;
+		}catch(Exception e) {
+			LOGGER.error("ERRO: {}", e.getMessage());
+		}
+		return null;
 	}
 }
