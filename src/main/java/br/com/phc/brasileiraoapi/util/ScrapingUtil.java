@@ -10,9 +10,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import br.com.phc.brasileiraoapi.dto.PartidaGoogleDTO;
 
+@Service
 public class ScrapingUtil {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScrapingUtil.class);
@@ -38,12 +40,6 @@ public class ScrapingUtil {
 	private static final String CASA = "casa";
 	private static final String VISITANTE = "visitante";
 	
-	public static void main(String[] args) {
-		ScrapingUtil scraping = new ScrapingUtil();
-		String url = scraping.montaUrlGoogle("Atletico-MG", "Caldense");
-		scraping.obtemInformacoesPartida(url);
-	}
-	
 	public PartidaGoogleDTO obtemInformacoesPartida(String url) {
 		PartidaGoogleDTO partida = new PartidaGoogleDTO();
 		
@@ -56,48 +52,59 @@ public class ScrapingUtil {
 			LOGGER.info("Titulo da pagina {}", title);
 			
 			StatusPartida statusPartida = obtemStatusPartida(document);
+			partida.setStatusPartida(statusPartida);
 			LOGGER.info("Status partida: {}", statusPartida);
 			
 			if(statusPartida != StatusPartida.PARTIDA_NAO_INICIADA) {
 				String tempoPartida = obtemTempoPartida(document);
+				partida.setTempoPartida(tempoPartida);
 				LOGGER.info("Tempo Partida: {}", tempoPartida);
 				
 				Integer placarEquipeCasa = recuperaPlacarEquipe(document, DIV_PLACAR_EQUIPE_CASA);
+				partida.setPlacarEquipeCasa(placarEquipeCasa);
 				LOGGER.info("Placar equipe casa: {}", placarEquipeCasa);
 				
 				Integer placarEquipeVisitante = recuperaPlacarEquipe(document, DIV_PLACAR_EQUIPE_VISITANTE);
+				partida.setPlacarEquipeVisitante(placarEquipeVisitante);
 				LOGGER.info("Placar equipe visitante: {}", placarEquipeVisitante);
 				
 				String golsEquipeCasa = recuperaGolsEquipe(document, DIV_GOLS_EQUIPE_CASA);
+				partida.setGolsEquipeCasa(golsEquipeCasa);
 				LOGGER.info("Gols equipe casa: {}", golsEquipeCasa, DIV_GOLS_EQUIPE_CASA);
 				
 				String golsEquipeVisitante = recuperaGolsEquipe(document, DIV_GOLS_EQUIPE_VISITANTE);
+				partida.setGolsEquipeVisitante(golsEquipeVisitante);
 				LOGGER.info("Gols equipe visitante: {}", golsEquipeVisitante, DIV_GOLS_EQUIPE_VISITANTE);
 				
 				Integer placarEstendidoEquipeCasa = buscaPenalidades(document, CASA);
+				partida.setPlacarEstendidoEquipeCasa(placarEstendidoEquipeCasa);
 				LOGGER.info("Placa estendido equipe casa: {}", placarEstendidoEquipeCasa);
 				
 				Integer placarEstendidoEquipeVisitante = buscaPenalidades(document, VISITANTE);
+				partida.setPlacarEstendidoEquipeVisitante(placarEstendidoEquipeVisitante);
 				LOGGER.info("Placar estendido equipe visitante: {}", placarEstendidoEquipeVisitante);
 			}
 			
 			String nomeEquipeCasa = recuperaNomeEquipe(document, DIV_DADOS_EQUIPE_CASA);
+			partida.setNomeEquipeCasa(nomeEquipeCasa);
 			LOGGER.info("Nome Equipe Casa: {}", nomeEquipeCasa);
 			
 			String nomeEquipeVisitante = recuperaNomeEquipe(document, DIV_DADOS_EQUIPE_VISITANTE);
+			partida.setNomeEquipeVisitante(nomeEquipeVisitante);
 			LOGGER.info("Nome Equipe Visitante: {}", nomeEquipeVisitante);
 			
 			String urlLogoEquipeCasa = recuperaLogoEquipe(document, DIV_DADOS_EQUIPE_CASA);
+			partida.setUrlLogoEquipeCasa(urlLogoEquipeCasa);
 			LOGGER.info("Url logo equipe casa: {}", urlLogoEquipeCasa);
 			
 			String urlLogoEquipeVisitante = recuperaLogoEquipe(document, DIV_DADOS_EQUIPE_VISITANTE);
+			partida.setUrlLogoEquipeVisitante(urlLogoEquipeVisitante);
 			LOGGER.info("Url logo equipe visitante: {}", urlLogoEquipeVisitante);
-			
+			return partida;
 		}catch(IOException e) {
 			LOGGER.error("ERRO AO TENTAR CONECTAR AO JSOUP -> {}", e.getMessage());
 		}
-		
-		return partida;
+		return null;
 	}
 	
 	public StatusPartida obtemStatusPartida(Document document) {
